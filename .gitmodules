@@ -1,0 +1,6 @@
+[submodule "E_comm_api"]
+	path = E_comm_api
+	url = https://github.com/blake-mcguire/E_comm_api.git
+[submodule "submodules/E_comm_api"]
+	path = submodules/E_comm_api
+	url = https://github.com/blake-mcguire/E_comm_api.git
