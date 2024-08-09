@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Carousel, Card, Row, Col } from 'react-bootstrap';
+import { Carousel, Card, Row, Col, Button } from 'react-bootstrap';
 import axios from 'axios';
-
-import '../style_modules/ProductCarousel.css'; // Import custom CSS
+import '../style_modules/ProductCarousel.css';
 
 const ProductCarousel = () => {
     const [products, setProducts] = useState([]);
@@ -11,7 +10,6 @@ const ProductCarousel = () => {
         const fetchProducts = async () => {
             try {
                 const response = await axios.get('http://localhost:5000/products');
-                console.log('Fetched products:', response.data); // Log fetched products
                 setProducts(response.data);
             } catch (error) {
                 console.error('Error fetching products:', error);
@@ -21,16 +19,20 @@ const ProductCarousel = () => {
         fetchProducts();
     }, []);
 
-    // Setup auto-scrolling
+    
     useEffect(() => {
         const interval = setInterval(() => {
             setProducts(prev => [...prev.slice(1), prev[0]]);
-        }, 3000); // Scrolls every 3 seconds
+        }, 3000); 
 
-        return () => clearInterval(interval); // Cleanup interval on component unmount
+        return () => clearInterval(interval); 
     }, [products]);
 
-    console.log('Products state:', products); // Log products state
+    const addToCart = (product) => {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        cart.push(product);
+        localStorage.setItem('cart', JSON.stringify(cart));
+    };
 
     return (
         <div>
@@ -45,6 +47,7 @@ const ProductCarousel = () => {
                                         <Card.Body>
                                             <Card.Title>{product.name}</Card.Title>
                                             <Card.Text>${product.price.toFixed(2)}</Card.Text>
+                                            <Button variant="primary" onClick={() => addToCart(product)}>Add to Cart</Button>
                                         </Card.Body>
                                     </Card>
                                 </Col>

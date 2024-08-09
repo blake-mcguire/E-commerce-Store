@@ -5,13 +5,11 @@ import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../style_modules/CreateAccount.css';
 
-const CreateAccount = () => {
+const CreateAdminAccount = () => {
     const [formData, setFormData] = useState({
         username: '',
         password: '',
-        name: '',
         email: '',
-        phone: ''
     });
     const navigate = useNavigate();
 
@@ -22,19 +20,26 @@ const CreateAccount = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const accountResponse = await axios.post('http://localhost:5000/customer_accounts', {
-                username: formData.username,
-                password: formData.password,
-                name: formData.name,
-                email: formData.email,
-                phone: formData.phone
+            const accountResponse = await axios.post('http://localhost:5000/admin_accounts', formData, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             });
-
             if (accountResponse.data.success) {
-                navigate('/');
+                const sessionResponse = await axios.post('http://localhost:5000/admin_login', { email: formData.email, password: formData.password }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                if (sessionResponse.data.success) {
+                    localStorage.setItem('session_id', sessionResponse.data.session_id);
+                    localStorage.setItem('user_id', sessionResponse.data.user_id);
+                    localStorage.setItem('user_type', sessionResponse.data.user_type);
+                    
+                }
             }
         } catch (error) {
-            console.error('Error creating account:', error);
+            console.error('Error creating admin account:', error);
         }
     };
 
@@ -43,7 +48,7 @@ const CreateAccount = () => {
             <Row>
                 <Col>
                     <Form onSubmit={handleSubmit} className="p-4 rounded shadow" style={{ backgroundColor: '#ffffff' }}>
-                        <h2 className="mb-4">Create Account</h2>
+                        <h2 className="mb-4">Create Admin Account</h2>
                         <Form.Group controlId="formUsername" className="mb-3">
                             <Form.Label>Username</Form.Label>
                             <Form.Control
@@ -66,17 +71,6 @@ const CreateAccount = () => {
                                 required
                             />
                         </Form.Group>
-                        <Form.Group controlId="formName" className="mb-3">
-                            <Form.Label>Name</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="name"
-                                placeholder="Name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                required
-                            />
-                        </Form.Group>
                         <Form.Group controlId="formEmail" className="mb-3">
                             <Form.Label>Email</Form.Label>
                             <Form.Control
@@ -86,16 +80,6 @@ const CreateAccount = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formPhone" className="mb-3">
-                            <Form.Label>Phone</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="phone"
-                                placeholder="Phone"
-                                value={formData.phone}
-                                onChange={handleChange}
                             />
                         </Form.Group>
                         <Button variant="primary" type="submit">
@@ -108,4 +92,4 @@ const CreateAccount = () => {
     );
 };
 
-export default CreateAccount;
+export default CreateAdminAccount;
